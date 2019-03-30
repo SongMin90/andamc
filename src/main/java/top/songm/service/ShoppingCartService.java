@@ -1,6 +1,5 @@
 package top.songm.service;
 
-import com.alibaba.fastjson.JSONObject;
 import top.songm.model.request.ShoppingCart;
 import top.songm.model.response.ShoppingCartRow;
 
@@ -15,8 +14,6 @@ public interface ShoppingCartService {
     void addOneShoppingCart(ShoppingCart shoppingCart);
 
     List<ShoppingCartRow> findListByOpenidWithPage(String openid, int position, int pageSize);
-
-    JSONObject buyOrder(List<ShoppingCartRow> shoppingCartRows);
 
     void removeByOpenidAndProductIds(String openid, int[] productIds);
 }

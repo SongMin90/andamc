@@ -25,7 +25,7 @@ public class UserTest extends TmallApplicationTests {
 
     @Test
     public void register() {
-        userMapper.registerUser("4");
-        System.out.println(123);
+//        userMapper.registerUser("4");
+//        System.out.println(123);
     }
 }

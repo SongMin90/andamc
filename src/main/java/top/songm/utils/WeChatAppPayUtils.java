@@ -1,13 +1,21 @@
 package top.songm.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Base64;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
+import java.security.AlgorithmParameters;
+import java.security.Security;
 import java.util.*;
 
 /**
@@ -16,10 +24,11 @@ import java.util.*;
  */
 public class WeChatAppPayUtils {
 
-    public static final String APPID = "wx545267dffd88ff64";
+    //小程序appid
+    public static final String APP_ID = "wx545267dffd88ff64";
 
-
-    public final String APPSECRET = "2eb40a3134487ce040f7bd5eb63f6223";
+    //小程序appsecret
+    public static final String APPSECRET = "2eb40a3134487ce040f7bd5eb63f6223";
 
     //商户号
     public static final String MCH_ID = "1530322721";
@@ -28,12 +37,13 @@ public class WeChatAppPayUtils {
     public static final String MCH_ID_KEY = "wsxedcrfvvfrcdexswqaztgbyhnmjuik";
 
     //统一下单地址
-    public final static String PAYURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+    public static final String PAYURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
-    /***
-     * 异步回调地址
-     * */
-    public final static String NOTIFY_URL = "https://songm.top/pay";
+    //异步回调地址
+    public static final String NOTIFY_URL = "https://songm.top/pay";
+
+    //支付标题
+    public static final String BODY = "安达门窗支付中心-商品付款";
 
 
     /**
@@ -83,7 +93,7 @@ public class WeChatAppPayUtils {
      * */
     public static String getNonceStr() {
         UUID uuid = UUID.randomUUID();
-        return uuid.toString().replace("-", "");
+        return uuid.toString().replace("-", "").toUpperCase();
     }
 
 
@@ -144,7 +154,7 @@ public class WeChatAppPayUtils {
      * @param paySecret 签名密钥
      * @return
      */
-    public static String  getSign (Map<String , String> paramMap , String paySecret){
+    public static String  getSign(Map<String , String> paramMap , String paySecret){
         SortedMap<String, String> smap = new TreeMap<String, String>(paramMap);
 
         StringBuffer stringBuffer = new StringBuffer();
@@ -157,5 +167,48 @@ public class WeChatAppPayUtils {
 
         String argPreSign = stringBuffer.append("key=").append(paySecret).toString();
         return MD5Util.MD5encode(argPreSign).toUpperCase();
+    }
+
+    /**
+     * 解密用户信息
+     * @param encryptedData
+     * @param sessionKey
+     * @param iv
+     * @return
+     */
+    public static JSONObject getUserInfo(String encryptedData, String sessionKey, String iv){
+        // 被加密的数据
+        byte[] dataByte = Base64.decode(encryptedData);
+        // 加密秘钥
+        byte[] keyByte = Base64.decode(sessionKey);
+        // 偏移量
+        byte[] ivByte = Base64.decode(iv);
+
+        try {
+            // 如果密钥不足16位，那么就补足.  这个if 中的内容很重要
+            int base = 16;
+            if (keyByte.length % base != 0) {
+                int groups = keyByte.length / base + (keyByte.length % base != 0 ? 1 : 0);
+                byte[] temp = new byte[groups * base];
+                Arrays.fill(temp, (byte) 0);
+                System.arraycopy(keyByte, 0, temp, 0, keyByte.length);
+                keyByte = temp;
+            }
+            // 初始化
+            Security.addProvider(new BouncyCastleProvider());
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding","BC");
+            SecretKeySpec spec = new SecretKeySpec(keyByte, "AES");
+            AlgorithmParameters parameters = AlgorithmParameters.getInstance("AES");
+            parameters.init(new IvParameterSpec(ivByte));
+            cipher.init(Cipher.DECRYPT_MODE, spec, parameters);// 初始化
+            byte[] resultByte = cipher.doFinal(dataByte);
+            if (null != resultByte && resultByte.length > 0) {
+                String result = new String(resultByte, "UTF-8");
+                return JSONObject.parseObject(result);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.servlet.MultipartConfigElement;
 
@@ -19,6 +20,7 @@ import javax.servlet.MultipartConfigElement;
  * @datetime 2018/12/23 15:27
  */
 @SpringBootApplication
+@EnableTransactionManagement
 public class Application {
 
     public static void main(String[] args) {

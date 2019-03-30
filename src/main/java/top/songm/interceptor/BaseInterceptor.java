@@ -32,7 +32,7 @@ public class BaseInterceptor implements HandlerInterceptor {
         String uri = request.getRequestURI();
 
         // 小程序校验openid
-        if(uri.contains("/shoppingCart/add") || uri.contains("/user/register") || uri.contains("/shoppingCart/buyOrder") || uri.contains("/appraise/add") || uri.contains("/shoppingCart/removeByProductIds")) {
+        if(uri.contains("/shoppingCart/add") || uri.contains("/user/register") || uri.contains("/appraise/add") || uri.contains("/shoppingCart/removeByProductIds") || uri.contains("/pay/getRequestPaymentData") || uri.contains("/pay/getRequestPaymentData2")) {
             String openid = request.getHeader("openid");
             List<User> list = userMapper.findByOpenid(openid);
             if (list.isEmpty()) {
@@ -40,7 +40,7 @@ public class BaseInterceptor implements HandlerInterceptor {
             }
         }
         // 管理员后台校验
-        if(uri.contains("/manager/findProductListByManagerWithPage") || uri.contains("/manager/remove") || uri.contains("/manager/productInfo") || uri.contains("/manager/addOrEditProductInfo")) {
+        if(uri.contains("/manager/findProductListByManagerWithPage") || uri.contains("/manager/remove") || uri.contains("/manager/productInfo") || uri.contains("/manager/addOrEditProductInfo") || uri.contains("/image/upload")) {
             HttpSession session = request.getSession();
             Object object = session.getAttribute("token");
             if (object != null) {

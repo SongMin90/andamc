@@ -2,6 +2,7 @@ package top.songm.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.songm.mapper.AppraiseMapper;
 import top.songm.mapper.ImageMapper;
 import top.songm.mapper.ProductMapper;
@@ -22,6 +23,7 @@ import java.util.List;
  * @datetime 2019/2/13 0:28
  */
 @Service
+@Transactional
 public class ProductServiceImpl implements ProductService {
 
     @Autowired

@@ -1,8 +1,8 @@
 package top.songm.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.songm.mapper.ManagerMapper;
 import top.songm.model.request.Manager;
 import top.songm.service.ManagerService;
@@ -18,6 +18,7 @@ import java.util.List;
  * @datetime 2019/2/17 10:21
  */
 @Service
+@Transactional
 public class ManagerServiceImpl implements ManagerService {
 
     @Autowired

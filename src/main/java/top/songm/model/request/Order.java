@@ -15,7 +15,18 @@ public class Order {
     private String openid;
     private int productId;
     private int number;
-    private double money;
+    private double money; // 产品单价
+
+    private String orderSn;
+    private String name;
+    private int discountType;
+    private String discountDesc;
+    private double discount;
+    private double discountTemp;
+    private String firstPicUrl;
+    private double realMoney; // 产品实付金额
+
+    private String ip;
     private int state;
 
     private int removeStatus;

@@ -9,7 +9,7 @@ import top.songm.model.request.User;
  */
 public interface UserService {
 
-    JSONObject login(String js_code);
+    JSONObject login(String js_code, String ip);
 
     void register(User user);
 

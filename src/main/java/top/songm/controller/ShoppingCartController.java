@@ -1,6 +1,5 @@
 package top.songm.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import top.songm.BaseLogger;
@@ -32,13 +31,6 @@ public class ShoppingCartController extends BaseLogger<ShoppingCartController> {
     public Msg list(Msg msg, @RequestParam("openid") String openid, @RequestParam("position") int position, @RequestParam("pageSize") int pageSize) {
         List<ShoppingCartRow> list = shoppingCartService.findListByOpenidWithPage(openid, position, pageSize);
         msg.setData(list);
-        return msg;
-    }
-
-    @PostMapping("/buyOrder")
-    public Msg buyOrder(Msg msg, @RequestBody List<ShoppingCartRow> shoppingCartRows) {
-        JSONObject jsonObject = shoppingCartService.buyOrder(shoppingCartRows);
-        msg.setData(jsonObject);
         return msg;
     }
 

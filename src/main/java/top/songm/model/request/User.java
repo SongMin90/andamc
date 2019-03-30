@@ -21,6 +21,7 @@ public class User {
     private String country;
     private String language;
     private String phone;
+    private String ip;
 
     private int removeStatus;
     private Date updateTime;

@@ -7,6 +7,10 @@ import top.songm.BaseLogger;
 import top.songm.model.request.User;
 import top.songm.model.response.Msg;
 import top.songm.service.UserService;
+import top.songm.utils.IpUtil;
+import top.songm.utils.WeChatAppPayUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 用户Controller
@@ -21,8 +25,9 @@ public class UserController extends BaseLogger<UserController> {
     private UserService userService;
 
     @GetMapping("/login")
-    public Msg login(Msg msg, @RequestParam(value = "js_code") String js_code) {
-        JSONObject json = userService.login(js_code);
+    public Msg login(Msg msg, @RequestParam(value = "js_code") String js_code, HttpServletRequest request) {
+        String ip = IpUtil.getIp(request);
+        JSONObject json = userService.login(js_code, ip);
         msg.setData(json);
         return msg;
     }
@@ -37,6 +42,13 @@ public class UserController extends BaseLogger<UserController> {
     public Msg info(Msg msg, @PathVariable("openid") String openid) {
         User user = userService.info(openid);
         msg.setData(user);
+        return msg;
+    }
+
+    @GetMapping("/getUserInfo")
+    public Msg getUserInfo(Msg msg, @RequestParam("encryptedData") String encryptedData, @RequestParam("session_key") String session_key, @RequestParam("iv") String iv) {
+        JSONObject userInfo = WeChatAppPayUtils.getUserInfo(encryptedData, session_key, iv);
+        msg.setData(userInfo);
         return msg;
     }
 

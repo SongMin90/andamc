@@ -1,5 +1,6 @@
 package top.songm.service;
 
+import top.songm.model.request.Order;
 import top.songm.model.response.OrderRow;
 
 import java.util.List;
@@ -10,5 +11,5 @@ import java.util.List;
  */
 public interface OrderService {
 
-    List<OrderRow> findByOpenidWithPage(String openid, int position, int pageSize);
+    List<Order> findByOpenidWithPage(String openid, int position, int pageSize);
 }
