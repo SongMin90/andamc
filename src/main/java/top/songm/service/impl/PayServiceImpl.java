@@ -12,10 +12,13 @@ import top.songm.model.request.PayData;
 import top.songm.service.PayService;
 import top.songm.utils.*;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.CharArrayWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +70,7 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
             // 删除其在购物车
             shoppingCartMapper.removeByOpenidAndProductIds(openid, payData.getProductId());
             // 合计
-            relAmount += (int) realMoney * 100;
+            relAmount += ((int) (realMoney * 100));
         }
         return getPayData(relAmount, orderSn, openid, ip);
     }
@@ -190,7 +193,7 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
     }
 
     @Override
-    public void callback(HttpServletRequest request) {
+    public void callback(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String> params = new HashMap<>();
         params.put("body", getBody(request));
         //读取xml内容转为map
@@ -228,6 +231,13 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
             if (StringUtils.equals(sign, comSign)) {
                 //TODO 通过out_trade_no或者attach查询到数据库里的订单,再进行验证等
                 orderMapper.updateStateByOrderSn(out_trade_no, 1); // 设为已付款
+                try {
+                    ServletOutputStream out = response.getOutputStream();
+                    OutputStreamWriter ow = new OutputStreamWriter(out,"UTF-8");
+                    ow.write("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+                    ow.flush();
+                    ow.close();
+                } catch (Exception e) {}
             } else {
                 LOGGER.info("验证签名失败 [ {} ]", params);
                 orderMapper.updateStateByOrderSn(out_trade_no, -1); // 设为付款失败

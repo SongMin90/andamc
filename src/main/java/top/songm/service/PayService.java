@@ -3,6 +3,7 @@ package top.songm.service;
 import top.songm.model.request.PayData;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -16,5 +17,5 @@ public interface PayService {
 
     Map<String, String> getRequestPaymentData2(HttpServletRequest request, int id);
 
-    void callback(HttpServletRequest request);
+    void callback(HttpServletRequest request, HttpServletResponse response);
 }

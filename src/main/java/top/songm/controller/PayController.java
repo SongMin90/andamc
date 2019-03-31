@@ -8,6 +8,7 @@ import top.songm.model.response.Msg;
 import top.songm.service.PayService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -47,8 +48,8 @@ public class PayController extends BaseLogger<PayController> {
      * 微信支付后异步回调
      * @param request
      */
-    @GetMapping("/callback")
-    public void callback(HttpServletRequest request){
-        payService.callback(request);
+    @PostMapping("/callback")
+    public void callback(HttpServletRequest request, HttpServletResponse response){
+        payService.callback(request, response);
     }
 }
