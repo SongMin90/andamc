@@ -42,7 +42,9 @@ public class UserServiceImpl implements UserService {
                 // 新增openid
                 userMapper.registerUser(openid, ip);
             } else if (StringUtils.isEmpty(userList.get(0).getNickName()) || StringUtils.isEmpty(userList.get(0).getAvatarUrl())) {
+                userMapper.updateIp(openid, ip);
             } else {
+                userMapper.updateIp(openid, ip);
                 json.put("isRegister", true);
             }
             // 设置openid

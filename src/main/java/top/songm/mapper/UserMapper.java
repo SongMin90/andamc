@@ -22,4 +22,7 @@ public interface UserMapper {
             "`province`=#{province,jdbcType=VARCHAR}, `city`=#{city,jdbcType=VARCHAR}, `country`=#{country,jdbcType=VARCHAR}, `language`=#{language,jdbcType=VARCHAR}, " +
             "`phone`=#{phone,jdbcType=VARCHAR}, `update_time`=NOW() WHERE (`openid`=#{openid,jdbcType=VARCHAR} AND `remove_status` = 0)")
     long updateUserByOpenid(User user);
+
+    @Update("UPDATE `user` SET `ip`=#{ip,jdbcType=VARCHAR}, `update_time`=NOW() WHERE (`openid`=#{openid,jdbcType=VARCHAR} AND `remove_status` = 0)")
+    long updateIp(@Param("openid") String openid, @Param("ip") String ip);
 }
