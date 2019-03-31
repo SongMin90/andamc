@@ -15,4 +15,6 @@ public interface PayService {
     Map<String, String> getRequestPaymentData(HttpServletRequest request, List<PayData> payDataList);
 
     Map<String, String> getRequestPaymentData2(HttpServletRequest request, int id);
+
+    void callback(HttpServletRequest request);
 }

@@ -83,4 +83,7 @@ public interface OrderMapper {
             "WHERE\n" +
             "\t`id` = #{id,jdbcType=INTEGER}")
     long removeById(@Param("id") int id);
+
+    @Update("UPDATE `order` SET `state`=#{state,jdbcType=INTEGER}, `update_time`= NOW() WHERE (`order_sn`=#{out_trade_no,jdbcType=VARCHAR} AND `remove_status` = 0)")
+    long updateStateByOrderSn(@Param("out_trade_no") String out_trade_no, @Param("state") int state);
 }

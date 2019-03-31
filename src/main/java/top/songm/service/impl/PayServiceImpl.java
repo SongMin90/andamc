@@ -1,5 +1,6 @@
 package top.songm.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,9 @@ import top.songm.service.PayService;
 import top.songm.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.CharArrayWriter;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +41,7 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
         String openid = request.getHeader("openid");
         String ip = IpUtil.getIp(request);
         //商品订单号
-        String orderSn = TimeUtil.formatTime(new Date(), "yyyyMMddHHmmss");
+        String orderSn = TimeUtil.formatTime(new Date(), "yyyyMMddHHmmss") + "_" + openid + "_" + relAmount;
         // 购买的产品列表
         for (PayData payData : payDataList) {
             // 实际金额
@@ -95,6 +99,7 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
 
     /**
      * 获取待支付订单信息
+     *
      * @param relAmount
      * @param openid
      * @param ip
@@ -182,5 +187,76 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
         } else {
             throw new RuntimeException("微信支付下单失败");
         }
+    }
+
+    @Override
+    public void callback(HttpServletRequest request) {
+        Map<String, String> params = new HashMap<>();
+        params.put("body", getBody(request));
+        //读取xml内容转为map
+        params = WeChatAppPayUtils.readStringXmlOut(params.getOrDefault("body", ""));
+
+        LOGGER.info("微信支付回调参数 [ {} ]", params);
+
+        //商户订单号
+        String out_trade_no = params.getOrDefault("out_trade_no", "");
+        //业务结果SUCCESS或者FAIL
+        String result_code = params.getOrDefault("result_code", "");
+        //支付金额 (分)
+        String total_fee = params.getOrDefault("total_fee", "");
+        //支付完成时间
+        String time_end = params.getOrDefault("time_end", "");
+
+        //签名
+        String sign = params.getOrDefault("sign", "");
+
+        //商家数据包，原样返回
+        String attach = params.getOrDefault("attach", "");
+
+        //排除sign参数的所有参数，参与签名 , 验证微信回调的签名
+        Map<String, String> map = new HashMap<>();
+        for (String s : params.keySet()) {
+            String value = params.get(s);
+            if (StringUtils.isNotBlank(value) && !StringUtils.equals(s, "sign")) {
+                map.put(s, value);
+            }
+        }
+
+        String comSign = WeChatAppPayUtils.getSign(map, WeChatAppPayUtils.MCH_ID_KEY);
+
+        if (null != result_code && "SUCCESS".equals(result_code)) {
+            if (StringUtils.equals(sign, comSign)) {
+                //TODO 通过out_trade_no或者attach查询到数据库里的订单,再进行验证等
+                orderMapper.updateStateByOrderSn(out_trade_no, 1); // 设为已付款
+            } else {
+                LOGGER.info("验证签名失败 [ {} ]", params);
+                orderMapper.updateStateByOrderSn(out_trade_no, -1); // 设为付款失败
+            }
+        } else {
+            LOGGER.info("支付失败 [ {} ]", params);
+            orderMapper.updateStateByOrderSn(out_trade_no, -1); // 设为付款失败
+        }
+    }
+
+    /**
+     * 回调getBody
+     *
+     * @param request
+     * @return
+     */
+    private String getBody(HttpServletRequest request) {
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+            CharArrayWriter data = new CharArrayWriter();
+            char[] buf = new char[8192];
+            int ret;
+            while ((ret = in.read(buf, 0, 8192)) != -1) {
+                data.write(buf, 0, ret);
+            }
+            return data.toString();
+        } catch (Exception e) {
+            LOGGER.error("接收BODY内容失败：" + e);
+        }
+        return null;
     }
 }

@@ -40,7 +40,7 @@ public class WeChatAppPayUtils {
     public static final String PAYURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
     //异步回调地址
-    public static final String NOTIFY_URL = "https://songm.top/pay";
+    public static final String NOTIFY_URL = "https://andamc.songm.top/pay/callback";
 
     //支付标题
     public static final String BODY = "安达门窗支付中心-商品付款";

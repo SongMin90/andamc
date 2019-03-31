@@ -1,10 +1,7 @@
 package top.songm.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.songm.BaseLogger;
 import top.songm.model.request.PayData;
 import top.songm.model.response.Msg;
@@ -44,5 +41,14 @@ public class PayController extends BaseLogger<PayController> {
         Map<String, String> stringStringMap = payService.getRequestPaymentData2(request, id);
         msg.setData(stringStringMap);
         return msg;
+    }
+
+    /**
+     * 微信支付后异步回调
+     * @param request
+     */
+    @GetMapping("/callback")
+    public void callback(HttpServletRequest request){
+        payService.callback(request);
     }
 }
