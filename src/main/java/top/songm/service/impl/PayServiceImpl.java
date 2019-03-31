@@ -41,7 +41,7 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
         String openid = request.getHeader("openid");
         String ip = IpUtil.getIp(request);
         //商品订单号
-        String orderSn = TimeUtil.formatTime(new Date(), "yyyyMMddHHmmss") + "_" + openid + "_" + relAmount;
+        String orderSn = TimeUtil.formatTime(new Date(), "yyyyMMddHHmmss");
         // 购买的产品列表
         for (PayData payData : payDataList) {
             // 实际金额
