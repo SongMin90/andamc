@@ -18,4 +18,6 @@ public interface PayService {
     Map<String, String> getRequestPaymentData2(HttpServletRequest request, int id);
 
     void callback(HttpServletRequest request, HttpServletResponse response);
+
+    boolean getPayState(String orderSn);
 }

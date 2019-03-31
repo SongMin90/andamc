@@ -134,7 +134,7 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
         //将参数字典序列排序
         String stringSignTemp = WeChatAppPayUtils.formatUrlMap(map, false, false);
 
-        stringSignTemp = stringSignTemp + "&key=wsxedcrfvvfrcdexswqaztgbyhnmjuik";
+        stringSignTemp = stringSignTemp + "&key=" + WeChatAppPayUtils.MCH_ID_KEY;
 
         //得到签名
         String sign = MD5Util.MD5encode(stringSignTemp).toUpperCase();
@@ -268,5 +268,56 @@ public class PayServiceImpl extends BaseLogger<PayServiceImpl> implements PaySer
             LOGGER.error("接收BODY内容失败：" + e);
         }
         return null;
+    }
+
+    @Override
+    public boolean getPayState(String orderSn) {
+        String nonceStr = WeChatAppPayUtils.getNonceStr();
+        String APP_ID = WeChatAppPayUtils.APP_ID;
+        String MCH_ID = WeChatAppPayUtils.MCH_ID;
+
+
+        // 加密，这里只列举必填字段
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("appid", APP_ID);//小程序ID
+        map.put("mch_id", MCH_ID);//商户平台id
+        map.put("out_trade_no", orderSn);//商品订单号
+        map.put("nonce_str", nonceStr);//随机字符串
+
+        //将参数字典序列排序
+        String stringSignTemp = WeChatAppPayUtils.formatUrlMap(map, false, false);
+
+        stringSignTemp = stringSignTemp + "&key=" + WeChatAppPayUtils.MCH_ID_KEY;
+
+        //得到签名
+        String sign = MD5Util.MD5encode(stringSignTemp).toUpperCase();
+
+        String xml = "<xml>\n" +
+                "   <appid>"+APP_ID+"</appid>\n" +
+                "   <mch_id>"+MCH_ID+"</mch_id>\n" +
+                "   <nonce_str>"+nonceStr+"</nonce_str>\n" +
+                "   <out_trade_no>"+orderSn+"</out_trade_no>\n" +
+                "   <sign>"+sign+"</sign>\n" +
+                "</xml>";
+
+        LOGGER.info("发送给微信的报文：" + xml);
+        LOGGER.info("加密后的的签名字符串：" + sign);
+
+        // 请求
+        String response = HttpUtils.sentPost(WeChatAppPayUtils.PAY_INFO_URL, xml, "UTF-8");
+        LOGGER.info("请求/pay/orderquery查询订单接口后返回数据：" + response);
+        // 处理请求结果
+        // 将返回的xml转为map
+        Map<String, String> resultMap = WeChatAppPayUtils.readStringXmlOut(response);
+
+        String return_code = resultMap.getOrDefault("return_code", "");
+        String result_code = resultMap.getOrDefault("result_code", "");
+        if (return_code != null && "SUCCESS".equals(return_code) && result_code != null && "SUCCESS".equals(result_code)) {
+            String trade_state = resultMap.getOrDefault("trade_state", "");
+            if (trade_state != null && "SUCCESS".equals(trade_state)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

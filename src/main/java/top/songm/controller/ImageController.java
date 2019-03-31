@@ -1,5 +1,6 @@
 package top.songm.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,24 @@ public class ImageController {
         } catch (Exception e) {
             throw new UploadException(e);
         }
+        return msg;
+    }
+
+    @PostMapping("/uploadMore")
+    public Msg uploadMore(Msg msg, MultipartFile[] imgFiles, HttpServletRequest request) {
+        JSONArray array = new JSONArray();
+        try {
+            for (MultipartFile imgFile : imgFiles) {
+                String originalFilename = imgFile.getOriginalFilename();
+                String fileName = UUID.randomUUID().toString().replace("-", "") + originalFilename.substring(originalFilename.lastIndexOf("."));
+                String filePath = Constant.getUplodFilePath() + fileName;
+                imgFile.transferTo(new File(filePath));
+                array.add(request.getScheme() +"://" + request.getServerName()  + ":" +request.getServerPort()  + "/upload/" + fileName);
+            }
+        } catch (Exception e) {
+            throw new UploadException(e);
+        }
+        msg.setData(array);
         return msg;
     }
 }

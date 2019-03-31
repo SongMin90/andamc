@@ -40,7 +40,7 @@ public class BaseInterceptor implements HandlerInterceptor {
             }
         }
         // 管理员后台校验
-        if(uri.contains("/manager/findProductListByManagerWithPage") || uri.contains("/manager/remove") || uri.contains("/manager/productInfo") || uri.contains("/manager/addOrEditProductInfo") || uri.contains("/image/upload")) {
+        if(uri.contains("/manager/findProductListByManagerWithPage") || uri.contains("/manager/remove") || uri.contains("/manager/productInfo") || uri.contains("/manager/addOrEditProductInfo")) {
             HttpSession session = request.getSession();
             Object object = session.getAttribute("token");
             if (object != null) {

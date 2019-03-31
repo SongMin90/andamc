@@ -45,6 +45,9 @@ public class WeChatAppPayUtils {
     //支付标题
     public static final String BODY = "安达门窗支付中心-商品付款";
 
+    //查询支付订单
+    public static final String PAY_INFO_URL = "https://api.mch.weixin.qq.com/pay/orderquery";
+
 
     /**
      * 获取精确到秒的时间戳 10 位数
