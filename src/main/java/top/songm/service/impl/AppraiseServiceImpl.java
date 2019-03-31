@@ -7,10 +7,7 @@ import top.songm.mapper.AppraiseMapper;
 import top.songm.mapper.ImageMapper;
 import top.songm.mapper.OrderMapper;
 import top.songm.mapper.UserMapper;
-import top.songm.model.request.Appraise;
-import top.songm.model.request.Image;
-import top.songm.model.request.Order;
-import top.songm.model.request.User;
+import top.songm.model.request.*;
 import top.songm.model.response.AppraiseRow;
 import top.songm.service.AppraiseService;
 import top.songm.utils.TimeUtil;
@@ -61,12 +58,20 @@ public class AppraiseServiceImpl implements AppraiseService {
     }
 
     @Override
-    public void add(Appraise appraise) {
+    public void add(AppraiseRequest appraiseRequest) {
         // 查询订单信息
-        Order order = orderMapper.findById(appraise.getOrderId());
+        Order order = orderMapper.findById(appraiseRequest.getOrderId());
         // 添加评价
-        appraise.setProductId(order.getProductId());
-        appraiseMapper.save(appraise);
+        appraiseRequest.setProductId(order.getProductId());
+        int appraiseId = appraiseMapper.saveReturnId(appraiseRequest);
+        // 评价图片
+        for (String imgUrl : appraiseRequest.getImgUrlList()) {
+            Image image = new Image();
+            image.setDataId(appraiseId);
+            image.setUrl(imgUrl);
+            image.setType(1);
+            imageMapper.save(image);
+        }
         // 设置订单状态为已评价
         orderMapper.updateStateById(order.getId(), 2);
     }

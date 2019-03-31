@@ -3,6 +3,7 @@ package top.songm.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import top.songm.model.request.Appraise;
+import top.songm.model.request.AppraiseRequest;
 import top.songm.model.response.AppraiseRow;
 import top.songm.model.response.Msg;
 import top.songm.service.AppraiseService;
@@ -28,8 +29,8 @@ public class AppraiseController {
     }
 
     @PostMapping("/add")
-    public Msg add(Msg msg, @RequestBody Appraise appraise) {
-        appraiseService.add(appraise);
+    public Msg add(Msg msg, @RequestBody AppraiseRequest appraiseRequest) {
+        appraiseService.add(appraiseRequest);
         return msg;
     }
 }

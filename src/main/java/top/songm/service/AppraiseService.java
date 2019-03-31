@@ -1,6 +1,6 @@
 package top.songm.service;
 
-import top.songm.model.request.Appraise;
+import top.songm.model.request.AppraiseRequest;
 import top.songm.model.response.AppraiseRow;
 
 import java.util.List;
@@ -13,5 +13,5 @@ public interface AppraiseService {
 
     List<AppraiseRow> findByProductIdWithPage(int productId, int position, int pageSize);
 
-    void add(Appraise appraise);
+    void add(AppraiseRequest appraiseRequest);
 }
